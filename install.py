@@ -15,7 +15,8 @@ class FirebaseUploadInstaller(ExtensionInstaller):
             config={
                 'StdReport': {
                     'FirebaseUpload': {
-                        'skin': 'FirebaseUpload'}}},
+                        'skin': 'FirebaseUpload',
+                        'enable': 'true'}}},
             files=[('bin/user', ['bin/user/FirebaseUpload.py']),
                    ('skins/FirebaseUpload', ['skins/FirebaseUpload/skin.conf'])],
             )

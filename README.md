@@ -5,36 +5,23 @@ This is a weewx extension to upload web files to a Firebase instance.
 Uploads the weewx files to a static site hosted on Firebase. Inspired
 by Bill Madill's S3upload extension.
 
-This has been tested against weewx 3.7.1 and Firebase 3.14.0
+This has been tested against weewx 4.9.1 and Firebase 11.16.1
 
 ## Setup
 
-For Debian 8 running on a BeagleBone
+For Ubuntu 22.04.1
 
 Install a current version of nodejs from deb.nodesource, not the
 default package manager repository
 
-```
-curl -sL https://deb.nodesource.com/setup_8.x | bash
-apt-get install nodejs
-apt-get install build-essential
-```
-
-Get a Firebase static site, install the Firebase CLI and init the local app
+Get a Firebase static site, install the Firebase CLI and init the html root: /var/www/html/
 
 ```
-npm install -g firebase-tools --unsafe-perms
-mkdir -p /srv/weewx/build
-cd /srv/weewx
+cd /var/www/html/
 firebase init
 ```
 
 Clone this repo; e.g. to your home directory
-
-```
-cd ~
-git clone https://github.com/johncraw/weewx-firebase.git
-```
 
 ## Installation instructions
 
@@ -44,13 +31,7 @@ git clone https://github.com/johncraw/weewx-firebase.git
   wee_extension --install ~/weewx-firebase/
   ```
 
-2. copy to the deployment directory:
-
-  ```
-  cp -p deploy.js /srv/weewx
-  ```
-
-3. (re)start weewx:
+2. (re)start weewx:
 
   ```
   systemctl stop weewx
@@ -66,19 +47,14 @@ git clone https://github.com/johncraw/weewx-firebase.git
   cp -rp bin/user/firebase /usr/share/weewx/user
   ```
 
-2. copy to the deployment directory:
-
-  ```
-  cp -p deploy.js /srv/weewx
-  ```
-
-3. add the following to weewx.conf
+2. add the following to weewx.conf
 
   ```
   [StdReport]
       ...
       [[firebase]]
           skin = firebase
+          enable = true
   ```
 
 4. (re)start weewx:

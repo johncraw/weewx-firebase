@@ -36,7 +36,7 @@ class FirebaseUploadGenerator(weewx.reportengine.ReportGenerator):
             html_root = self.config_dict['StdReport']['HTML_ROOT']
             self.local_root = os.path.join(self.config_dict['WEEWX_ROOT'], html_root) + "/"
             syslog.syslog(syslog.LOG_INFO, "FirebaseUpload: deploying from '%s'" % (self.local_root)) 
-        except KeyError, e:
+        except KeyError as e:
             syslog.syslog(syslog.LOG_INFO, "FirebaseUpload: no upload configured. %s" % e)
 
         syslog.syslog(syslog.LOG_DEBUG, "FirebaseUpload: uploading")
@@ -50,14 +50,14 @@ class FirebaseUploadGenerator(weewx.reportengine.ReportGenerator):
         start_ts = time.time()
         t_str = timestamp_to_string(start_ts)
         syslog.syslog(syslog.LOG_INFO, "FirebaseUpload: start upload at %s" % t_str)
-        cmd = ["/usr/bin/node"]
-        cmd.extend(["/srv/weewx/deploy.js"])
+        cmd = ["firebase"]
+        cmd.extend(["deploy"])
         syslog.syslog(syslog.LOG_DEBUG, "FirebaseUpload command: %s" % cmd)
         try:
-            FirebaseUpload_cmd = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            FirebaseUpload_cmd = subprocess.Popen(cmd, cwd= self.local_root, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             stdout = FirebaseUpload_cmd.communicate()[0]
             stroutput = stdout.strip()
-        except OSError, e:
+        except OSError as e:
             if e.errno == errno.ENOENT:
                 syslog.syslog(syslog.LOG_ERR, "FirebaseUpload: can't deploy. (errno %d, \"%s\")" % (e.errno, e.strerror))
             raise
@@ -65,7 +65,7 @@ class FirebaseUploadGenerator(weewx.reportengine.ReportGenerator):
         if weewx.debug == 1:
             syslog.syslog(syslog.LOG_DEBUG, "FirebaseUpload: deploy output: %s" % stroutput)
 
-        if stroutput.find('Site was deployed') >= 0:
+        if FirebaseUpload_cmd.returncode == 0:
             syslog.syslog(syslog.LOG_INFO, "FirebaseUpload: site was deployed")
         else:
             syslog.syslog(syslog.LOG_INFO, "FirebaseUpload: can't deploy")
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     try :
         config_dict = configobj.ConfigObj(config_path, file_error=True)
     except IOError:
-        print "Unable to open configuration file ", config_path
+        print("Unable to open configuration file ", config_path)
         exit()
         
     if 'FirebaseUpload' not in config_dict:
@@ -117,7 +117,7 @@ if __name__ == '__main__':
         exit(1)
     
     engine = None
-    FirebaseUpload = uploadFiles(engine, config_dict)
+    FirebaseUpload = engine.uploadFiles(config_dict)
     
     rec = {'extraTemp1': 1.0,
            'outTemp'   : 38.2,
